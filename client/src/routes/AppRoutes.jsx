@@ -2,40 +2,61 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
-import CircularProgress from "@mui/material/CircularProgress";
-import Layout from "../layouts/Layout";
-import LayoutMain from "../layouts/LayoutMain";
-import Transactions from "../pages/Transactions";
-import Auth from "../pages/Auth";
-import Verification from "../pages/Verification";
-import Logout from "../pages/Logout";
-import TransactionForm from "../pages/TransactionForm";
+// import CircularProgress from "@mui/material/CircularProgress";
+import MainLayout from "../components/MainLayout.jsx";
+import Dashboard from "../pages/Dashboard.jsx";
+import CategoryTransactions from "../pages/CategoryTransactions.jsx";
+// import Logout from "../pages/Logout.jsx";
 
 export default React.memo(function AppRoutes() {
   const user = useSelector((state) => state.user);
 
-  return user.isAuthenticated === null ? (
-    <div className="h-screen flex items-center justify-center space-x-4">
-      <h4>Loading</h4>
-      {/* <CircularProgress /> */}
-    </div>
-  ) : (
+  return (
+    //   user.isAuthenticated === null ? (
+    //     <MainLayout>
+    //       <h4>Loading</h4>
+    //       {/* <CircularProgress /> */}
+    //     </MainLayout>
+    //   ) : (
     <Routes>
-      <Route path="/" index element={<LayoutMain />} />
+      {/* <Route path="/" index element={user.isAuthenticated ? <MainLayout></MainLayout> : <Navigate to="/sign-up" />} /> */}
       <Route
-        path="/dashboard"
+        path="/"
         index
         element={
-          user.isAuthenticated ? (
-            <LayoutMain>
-              <Transactions />
-            </LayoutMain>
-          ) : (
-            <Navigate to="/" />
-          )
+          <MainLayout>
+            <Dashboard />
+          </MainLayout>
         }
       />
       <Route
+        path="/incomes"
+        index
+        element={
+          <MainLayout>
+            <CategoryTransactions type="Incomes" />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/savings"
+        index
+        element={
+          <MainLayout>
+            <CategoryTransactions type="Savings" />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/expenses"
+        index
+        element={
+          <MainLayout>
+            <CategoryTransactions type="Expenses" />
+          </MainLayout>
+        }
+      />
+      {/* <Route
         path="/create-transaction"
         index
         element={
@@ -55,8 +76,8 @@ export default React.memo(function AppRoutes() {
             <Auth />
           </Layout>
         }
-      />
-      <Route
+      /> */}
+      {/* <Route
         path="/verification"
         element={
           user.isBeingVerified ? (
@@ -75,8 +96,9 @@ export default React.memo(function AppRoutes() {
             <Logout />
           </Layout>
         }
-      />
-      <Route path="*" element={<Navigate to="/sign-up" />} />
+      /> */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
+  //   );
 });

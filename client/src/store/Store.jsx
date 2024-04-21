@@ -31,7 +31,7 @@ const reducer = (state = initialState, action) => {
 
 const store = configureStore({ reducer: reducer });
 
-export default function AuthProvider({ children }) {
+export default function StoreProvider({ children }) {
   // ... rest of your code here, replacing React.useState and React.useEffect with Redux actions and middleware
   return <Provider store={store}>{children}</Provider>;
 }
