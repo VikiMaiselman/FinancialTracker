@@ -4,55 +4,16 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
 
-import { User } from "../dbs/mongo-db.js";
+import User from "../models/UserSchema.js";
 import { authAndStoreSession, authenticateUser, registerUser } from "../models/User.js";
 
+/* AUTHENTICATE */
 export const signUp = async (req, res) => {
   const { username, password, phone, action, useTwilio } = req.body;
-
   if (action === "signup") return await register(req, res, username, password, phone, useTwilio);
   if (action === "login") return await login(req, res, username, password, useTwilio);
 };
 
-export const verify = async (req, res) => {
-  let verificationCheck, userPhoneStoredInDB;
-  const { username, password, otp } = req.body;
-
-  try {
-    const result = await User.authenticate()(username, password);
-    userPhoneStoredInDB = result.user.phone;
-
-    verificationCheck = await client.verify.v2
-      .services(process.env.TWILIO_SERVICE_SID)
-      .verificationChecks.create({ to: userPhoneStoredInDB, code: otp });
-    if (verificationCheck.status !== "approved") {
-      throw new Error("Invalid OTP!");
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(401).send(error.toString());
-  }
-  authAndStoreSession(req, res, verificationCheck);
-};
-
-export const logOut = (req, res, next) => {
-  req.logout(function (err) {
-    if (err) {
-      return next(err);
-    }
-    res.send(false);
-  });
-};
-
-export const checkAuthenticated = async (req, res) => {
-  res.send({ isAuthenticated: req.isAuthenticated(), user: req.user });
-};
-
-export const getBalance = async (req, res) => {
-  res.send({ balance: req.user?.balance });
-};
-
-/* Internal logic functions */
 async function register(req, res, username, password, phone, useTwilio) {
   let verification;
 
@@ -72,9 +33,9 @@ async function register(req, res, username, password, phone, useTwilio) {
       return res.status(400).send(error);
     }
   }
+
   return registerUser(req, res, username, phone, password, verification, useTwilio);
 }
-
 async function login(req, res, username, password, useTwilio) {
   let verification, userPhoneStoredInDB;
 
@@ -94,9 +55,68 @@ async function login(req, res, username, password, useTwilio) {
     }
     return res.json(verification.status);
   }
+
   authAndStoreSession(req, res, { status: "approved" });
 }
 
+/* VERIFY */
+export const verify = async (req, res) => {
+  let verificationCheck, userPhoneStoredInDB;
+  const { username, password, otp } = req.body;
+
+  try {
+    const result = await User.authenticate()(username, password);
+    userPhoneStoredInDB = result.user.phone;
+
+    verificationCheck = await client.verify.v2
+      .services(process.env.TWILIO_SERVICE_SID)
+      .verificationChecks.create({ to: userPhoneStoredInDB, code: otp });
+    if (verificationCheck.status !== "approved") {
+      throw new Error("Invalid OTP!");
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(401).send(error.toString());
+  }
+
+  authAndStoreSession(req, res, verificationCheck);
+};
+
+/* LOGOUT */
+export const logOut = (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.send(false);
+  });
+};
+
+/* GET DATA ASSOCIATED DIRECTLY WITH THE USER */
+export const getAuthenticationStatus = async (req, res) => {
+  res.send({ isAuthenticated: req.isAuthenticated(), user: req.user });
+};
+
+export const isAuthenticated = async (req, res) => {
+  try {
+    if (!req.isAuthenticated()) throw new Error("User is not authenticated. Could not get the transactions.");
+    return true;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getBalance = async (req, res) => {
+  res.send({ balance: req.user?.balance });
+};
+
+export const getCategories = async (req, res) => {
+  res.send({ categories: req.user?.categories });
+};
+
+
+/* Internal logic functions */
 async function verifyWithTwilioOTPs(phone) {
   try {
     const verification = await client.verify.v2

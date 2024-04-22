@@ -1,13 +1,8 @@
-import {
-  createNewTransaction,
-  findUserbyUsername,
-  getTransactionsFromMongoDB,
-  updateUserBalance,
-} from "../models/Transaction.js";
+import { createNewTransaction, getAllUserTransactions } from "../models/Transaction.js";
 
 export const getTransactions = async (req, res) => {
   try {
-    const txs = await getTransactionsFromMongoDB(req.user);
+    const txs = await getAllUserTransactions(req.user._id);
     return res.json(txs);
   } catch (error) {
     console.error(error);
@@ -16,31 +11,33 @@ export const getTransactions = async (req, res) => {
 };
 
 export const createTransaction = async (req, res) => {
-  const { name, amount, to } = req.body;
+  const { name, amount, categoryName, subcategoryName, date } = req.body;
   try {
-    const userTo = await findUserbyUsername(to);
-    const userFrom = req.user;
-
-    if (userTo === null) throw new Error("Check the reciepient data to be correct.");
-    if (userFrom === null) throw new Error("Please, sign up. You have been logged out.");
-
-    await createNewTransaction(name, amount, userTo, userFrom);
-    await updateBalances(userTo, userFrom, amount);
-    return res.send("Transaction successfully created!");
+    await createNewTransaction(name, amount, categoryName, subcategoryName, date, req.user._id);
+    return res.send("Transaction successfully created.");
   } catch (error) {
     console.error(error);
-    return res.status(400).send("Transaction was not successful. " + error);
+    return res.status(400).send("Transaction creation was not successful. " + error);
   }
 };
 
-async function updateBalances(userTo, userFrom, amount) {
+export const deleteTransaction = async (req, res) => {
   try {
-    const updateTo = userTo.balance + amount;
-    const updateFrom = userFrom.balance - amount;
-    await updateUserBalance(userTo.username, updateTo);
-    await updateUserBalance(userFrom.username, updateFrom);
+    await deleteTransaction(req.user._id, req.body.transactionId);
+    return res.send("Transaction successfully deleted.");
   } catch (error) {
     console.error(error);
-    throw error;
+    return res.status(400).send("Transaction deletion was not successful. " + error);
   }
-}
+};
+
+export const updateTransaction = async (req, res) => {
+  const updatedFields = req.body;
+  try {
+    await updateTransaction(req.user._id, transactionId, updatedFields);
+    return res.send("Transaction successfully updated.");
+  } catch (error) {
+    console.error(error);
+    return res.status(400).send("Transaction update was not successful. " + error);
+  }
+};
