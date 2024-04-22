@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from "react-redux";
 import MainLayout from "../components/MainLayout.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import CategoryTransactions from "../pages/CategoryTransactions.jsx";
+import Authentication from "../pages/Authentication.jsx";
+
 // import Logout from "../pages/Logout.jsx";
 
 export default React.memo(function AppRoutes() {
@@ -56,6 +58,7 @@ export default React.memo(function AppRoutes() {
           </MainLayout>
         }
       />
+      <Route path="/signup" index element={<Authentication />} />
       {/* <Route
         path="/create-transaction"
         index
