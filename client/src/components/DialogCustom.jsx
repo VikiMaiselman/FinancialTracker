@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import Button from "./Button";
 
-export default function DialogCustom({ children, onClick }) {
+export default function DialogCustom({ children, onClick, icon }) {
   const [open, setOpen] = useState(false);
 
   const handleClick = (e) => {
@@ -22,7 +22,7 @@ export default function DialogCustom({ children, onClick }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Edit</Button>
+        <Button>{icon}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

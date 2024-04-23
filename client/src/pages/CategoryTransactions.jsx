@@ -20,13 +20,13 @@ export default function CategoryTransactions({ categoryName }) {
       <div className="flex items-center justify-center">
         <CustomPieChart data={transactionsPerSubcategory} />
       </div>
+      <CreateTransaction />
+      <BreakLine />
       <TransactionsContainer
         categoryName={categoryName}
         txs={currentTransactions}
         categoryFullObject={currentCategory}
       />
-      <BreakLine />
-      <CreateTransaction />
     </div>
   );
 }

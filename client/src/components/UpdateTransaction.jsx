@@ -1,23 +1,12 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-// import DialogCustom from "./DialogCustom";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import Button from "./Button";
-import Input from "./Input";
+import EditIcon from "@mui/icons-material/Edit";
+import TransactionInputsGroup from "./TransactionInputsGroup.jsx";
+import DialogCustom from "./DialogCustom";
 
 import { checkAuthStatus, updateTransaction } from "../util/server-calls";
 import { setBalanceState, setTransactionsState } from "../util/helpers";
-import TransactionInputsGroup from "./TransactionInputsGroup.jsx";
-import DialogCustom from "./DialogCustom";
 
 export default function UpdateTransaction({ transaction }) {
   const dispatch = useDispatch();
@@ -32,15 +21,6 @@ export default function UpdateTransaction({ transaction }) {
     _id: transaction._id,
   });
 
-  //   const handleChange = (e) => {
-  //     const { name, value } = e.target;
-  //     if (["categoryName", "subcategoryName"].includes(name)) e.target.blur();
-  //     setUpdTransaction((prevState) => ({ ...prevState, [name]: value }));
-  //   };
-  //   const handleFocus = (e) => {
-  //     e.target.value = "";
-  //   };
-
   const handleUpdateTransaction = async (e) => {
     e.preventDefault();
     await updateTransaction(updTransaction);
@@ -50,7 +30,7 @@ export default function UpdateTransaction({ transaction }) {
   };
 
   return (
-    <DialogCustom onClick={handleUpdateTransaction}>
+    <DialogCustom onClick={handleUpdateTransaction} icon={<EditIcon />}>
       <TransactionInputsGroup
         transaction={updTransaction}
         categories={categories}

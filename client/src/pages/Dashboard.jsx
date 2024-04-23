@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import CreateTransaction from "../components/CreateTransaction";
 import TransactionsContainer from "../components/TransactionsContainer";
 import BreakLine from "../components/BreakLine.jsx";
+import CustomBarChart from "../components/CustomBarChart";
 
 export default function Dashboard() {
   const transactions = useSelector((state) => state.transactions);
@@ -17,13 +18,16 @@ export default function Dashboard() {
   //   })
   return (
     <div className="w-full mx-10 px-8 flex flex-col gap-5">
-      <h2 className="mb-3 font-bold uppercase md:text-4xl text-stone-900 tracking-wide">All Transactions</h2>
+      <h2 className="mb-6 font-bold uppercase md:text-4xl text-stone-900 tracking-wide">All Transactions</h2>
       <h3 className="mb-8 py-3 md:text-xl bg-stone-700 text-stone-200 tracking-wider">Total Balance: {balance} ₪</h3>
+      <div className="flex items-center justify-center">
+        <CustomBarChart />
+      </div>
+      <CreateTransaction />
+      <BreakLine />
       <TransactionsContainer categoryName={"Expenses"} txs={expenses} />
       <TransactionsContainer categoryName={"Incomes"} txs={incomes} />
       <TransactionsContainer categoryName={"Savings"} txs={savings} />
-      <BreakLine />
-      <CreateTransaction />
     </div>
   );
 }

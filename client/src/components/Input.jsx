@@ -19,19 +19,3 @@ export default function Input({ label, list = "", options = null, ...props }) {
     </p>
   );
 }
-
-/* <input
-        name="subtypeName"
-        id="subtype"
-        value={tx.subtypeName}
-        list={`datalist-${type.name}`}
-        placeholder="Select category..."
-        onChange={handleChange}
-        onFocus={handleFocus}
-        autoComplete="off"
-      />
-      <datalist id={`datalist-${type.name}`}>
-        {type.subtypes.map((subtype) => {
-          return <option key={subtype._id} value={subtype.name} />;
-        })}
-      </datalist>*/
