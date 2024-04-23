@@ -5,7 +5,6 @@ import { URL, HEADERS } from "./config.js";
 export async function signUp(data) {
   try {
     const result = await axios.post(`${URL}/sign-up`, data, { withCredentials: true }, HEADERS);
-    console.log(result);
     return result.data;
   } catch (error) {
     console.error(error);
@@ -120,6 +119,7 @@ export async function createTransaction(tx) {
 }
 
 export async function updateTransaction(updatedFields) {
+  console.log("UPDATED FIELDS", updatedFields);
   try {
     const result = await axios.patch(`${URL}/update-transaction`, updatedFields, { withCredentials: true }, HEADERS);
     return result.data;

@@ -11,7 +11,6 @@ export default function Input({ label, list = "", options = null, ...props }) {
         <datalist id={list}>
           {React.Children.toArray(
             options?.map((option) => {
-              console.log(option);
               return <option value={option.name} />;
             })
           )}
