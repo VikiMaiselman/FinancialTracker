@@ -7,10 +7,10 @@ import StoreProvider from "./store/Store.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <StoreProvider>
+    <StoreProvider>
+      <BrowserRouter>
         <App />
-      </StoreProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </StoreProvider>
   </React.StrictMode>
 );

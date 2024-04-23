@@ -6,11 +6,13 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
-import { composeDataForBackend, signUp } from "../util/helpers.js";
+import { composeDataForBackend } from "../util/helpers.js";
+import { checkAuthStatus, getAllTransactions, getBalance, getCategories, signUp } from "../util/server-calls.js";
 // import emailValidationSchema from "../util/emailValidation.js";
 // import { isPhoneValid } from "../util/phoneValidation.js";
 import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
+import { setAllState } from "../util/helpers.js";
 
 export default function Authentication() {
   /* state and hooks */
@@ -21,12 +23,9 @@ export default function Authentication() {
     phone: "",
   });
 
-  const user = useSelector((state) => state.user);
-  const balance = useSelector((state) => state.balance);
   const dispatch = useDispatch();
 
   /* error state */
-  const [isTwilioError, setIsTwilioError] = React.useState(false);
   const [emailError, setEmailError] = React.useState("");
   const [phoneError, setPhoneError] = React.useState("");
   const navigate = useNavigate();
@@ -41,7 +40,9 @@ export default function Authentication() {
 
   /* event handlers for onChange */
   const handleChangeTab = (e, newValue) => {
-    setActiveTab(() => newValue);
+    console.log(e, newValue);
+    e.preventDefault();
+    setActiveTab(newValue);
   };
 
   const handleChangeUserData = (e) => {
@@ -70,7 +71,8 @@ export default function Authentication() {
   };
 
   /* event handlers for onClick */
-  const handleClick = async () => {
+  const handleClick = async (e) => {
+    e.preventDefault();
     const data = composeDataForBackend(userData, activeTab);
     const response = await signUp(data);
 
@@ -83,51 +85,41 @@ export default function Authentication() {
       });
       return navigate("/verification", { state: data, replace: true });
     }
-    if (response === "isTwilioError") setIsTwilioError(true);
-
-    // other error
+    // error case
     return navigate("/sign-up");
   };
 
-  const handleClickNoTwilio = async () => {
+  const handleClickNoTwilio = async (e) => {
+    e.preventDefault();
     const data = composeDataForBackend(userData, activeTab, false);
     const response = await signUp(data);
 
     if (response === "approved") {
-      dispatch({
-        type: "SET_USER",
-        payload: {
-          isAuthenticated: true,
-          isBeingVerified: false,
-        },
-      });
+      const { user, isAuthenticated } = await checkAuthStatus();
+      setAllState(dispatch, user, isAuthenticated);
       return navigate("/");
     }
+    // error case
     return navigate("/sign-up");
   };
 
   return (
-    /*   flex: 1;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2.5%;
-  flex: 1;
-  padding: 50px;
-  text-align: center;*/
-    <div className="h-screen w-full flex overflow-hidden flex-col md:flex-row md:h-auto">
+    <div className="h-screen w-full flex overflow-scroll flex-col md:flex-row md:h-auto">
       <div className="flex-1 h-screen flex flex-col justify-center gap-5 py-12 px-12 text-center">
-        <h2 className="mb-8 font-bold uppercase md:text-4xl text-stone-900">Money Tracker</h2>
+        <h2 className="mb-8 font-bold uppercase md:text-5xl text-stone-900">Money Tracker</h2>
         <h2 className="mb-8 font-semibold md:text-xl text-stone-900">
           Register or Log In to see your current financial state
         </h2>
 
         <form>
-          <div sx={{ borderBottom: 1, borderColor: "divider", alignSelf: "center" }}>
-            <menu value={activeTab} onChange={handleChangeTab}>
-              <button id="signup" label="Sign Up" />
-              <button id="signin" label="Sign In" />
+          <div>
+            <menu value={activeTab}>
+              <Button id="signup" onClick={(e) => handleChangeTab(e, 0)}>
+                Sign Up
+              </Button>
+              <Button id="signin" onClick={(e) => handleChangeTab(e, 1)}>
+                Sign In
+              </Button>
             </menu>
           </div>
 
@@ -145,7 +137,6 @@ export default function Authentication() {
           <Input
             id="password"
             type="password"
-            // sx={{ marginBottom: `${activeTab === 0 ? "1em" : "2em"}` }}
             onChange={handleChangeUserData}
             name="password"
             label="Password"
@@ -160,8 +151,18 @@ export default function Authentication() {
               <PhoneInput
                 id="phone"
                 country={"il"}
-                inputStyle={{ width: "100%", background: "rgb(231 229 228)", color: "rgb(87 83 78)" }}
-                style={{ marginBottom: "2em" }}
+                inputStyle={{
+                  width: "100%",
+                  background: "rgb(231 229 228)",
+                  color: "rgb(87 83 78)",
+                  borderBottom: "2px solid rgb(214 211 209)",
+                  "&:focus": {
+                    borderBottom: "2px solid rgb(87 83 78)",
+                  },
+                }}
+                style={{
+                  marginBottom: "2em",
+                }}
                 onChange={handleChangeUserData}
                 name="phone"
                 value={userData.phone}
@@ -182,11 +183,10 @@ export default function Authentication() {
       </div>
 
       <div className="flex-1 h-screen flex flex-col justify-center gap-5 py-12 px-12 text-center bg-gradient-to-r from-stone-500 to-stone-800">
-        {/* s<i class="user fa-regular fa-user fa-10x" style="color: #ffffff"></i> */}
         <AccountBalanceWalletIcon sx={{ color: "white", width: "100%" }} style={{ fontSize: 150 }} />
-        <h2 className="mb-8 font-bold uppercase md:text-4xl text-stone-100">Your Financial Tracker</h2>
-        <h2 className="mb-8 font-normal md:text-xl text-stone-100">
-          The only application you need to be in complete charge of your money.
+        <h2 className="mb-8 font-bold uppercase md:text-4xl text-stone-100">Take Care of Your Money</h2>
+        <h2 className="mb-8 font-normal md:text-xl text-stone-100 tracking-wider">
+          The only application you need to be in full charge of your finance
         </h2>
       </div>
     </div>

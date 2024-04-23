@@ -7,55 +7,72 @@ import MainLayout from "../components/MainLayout.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import CategoryTransactions from "../pages/CategoryTransactions.jsx";
 import Authentication from "../pages/Authentication.jsx";
+import Logout from "../pages/Logout.jsx";
 
 // import Logout from "../pages/Logout.jsx";
 
 export default React.memo(function AppRoutes() {
   const user = useSelector((state) => state.user);
 
+  if (user.isAuthenticated === null) {
+    return (
+      <MainLayout>
+        <h4>Loading</h4>
+      </MainLayout>
+    );
+  }
   return (
-    //   user.isAuthenticated === null ? (
-    //     <MainLayout>
-    //       <h4>Loading</h4>
-    //       {/* <CircularProgress /> */}
-    //     </MainLayout>
-    //   ) : (
     <Routes>
-      {/* <Route path="/" index element={user.isAuthenticated ? <MainLayout></MainLayout> : <Navigate to="/sign-up" />} /> */}
       <Route
         path="/"
         index
         element={
-          <MainLayout>
-            <Dashboard />
-          </MainLayout>
-        }
-      />
-      <Route
-        path="/incomes"
-        index
-        element={
-          <MainLayout>
-            <CategoryTransactions type="Incomes" />
-          </MainLayout>
-        }
-      />
-      <Route
-        path="/savings"
-        index
-        element={
-          <MainLayout>
-            <CategoryTransactions type="Savings" />
-          </MainLayout>
+          user.isAuthenticated ? (
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          ) : (
+            <Navigate to="/signup" />
+          )
         }
       />
       <Route
         path="/expenses"
         index
         element={
-          <MainLayout>
-            <CategoryTransactions type="Expenses" />
-          </MainLayout>
+          user.isAuthenticated ? (
+            <MainLayout>
+              <CategoryTransactions categoryName="Expenses" />
+            </MainLayout>
+          ) : (
+            <Navigate to="/signup" />
+          )
+        }
+      />
+      <Route
+        path="/incomes"
+        index
+        element={
+          user.isAuthenticated ? (
+            <MainLayout>
+              <CategoryTransactions categoryName="Incomes" />
+            </MainLayout>
+          ) : (
+            <Navigate to="/signup" />
+          )
+        }
+      />
+      <Route
+        path="/savings"
+        index
+        element={
+          user.isAuthenticated ? (
+            <MainLayout>
+              <CategoryTransactions categoryName="Savings" />
+            </MainLayout>
+          ) : (
+            <Navigate to="/signup" />
+          )
         }
       />
       <Route path="/signup" index element={<Authentication />} />
@@ -91,15 +108,8 @@ export default React.memo(function AppRoutes() {
             <Navigate to="/" />
           )
         }
-      />
-      <Route
-        path="/logout"
-        element={
-          <Layout>
-            <Logout />
-          </Layout>
-        }
-      /> */}
+      />*/}
+      <Route path="/logout" element={<Logout />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

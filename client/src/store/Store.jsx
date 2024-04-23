@@ -1,16 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
-import React from "react";
+import React, { useEffect } from "react";
+
+import { checkAuthStatus } from "../util/server-calls.js";
 
 const initialState = {
   user: {
     username: "",
     isAuthenticated: null,
     isBeingVerified: "",
-    id: ",",
+    id: "",
   },
   balance: null,
-  txs: null,
+  transactions: [],
+  categories: null,
   wishes: null,
 };
 
@@ -21,7 +24,9 @@ const reducer = (state = initialState, action) => {
     case "SET_BALANCE":
       return { ...state, balance: action.payload };
     case "SET_TXS":
-      return { ...state, txs: action.payload };
+      return { ...state, transactions: action.payload };
+    case "SET_CATEGORIES":
+      return { ...state, categories: action.payload };
     case "SET_WISHES":
       return { ...state, wishes: action.payload };
     default:
@@ -32,6 +37,5 @@ const reducer = (state = initialState, action) => {
 const store = configureStore({ reducer: reducer });
 
 export default function StoreProvider({ children }) {
-  // ... rest of your code here, replacing React.useState and React.useEffect with Redux actions and middleware
   return <Provider store={store}>{children}</Provider>;
 }

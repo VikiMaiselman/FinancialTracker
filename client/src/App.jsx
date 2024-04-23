@@ -1,15 +1,28 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
-import "./App.css";
-import Sidebar from "./components/Sidebar";
 import AppRoutes from "./routes/AppRoutes";
 
+import { checkAuthStatus } from "./util/server-calls.js";
+import { setAllState, setUserNotAuthState } from "./util/helpers.js";
+
 function App() {
-  return (
-    // <div className="w-screen justify-between flex gap-1">
-    <AppRoutes />
-    // </div>
-  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const setUser = async () => {
+      const { isAuthenticated, user } = await checkAuthStatus();
+
+      if (!isAuthenticated) {
+        return setUserNotAuthState(dispatch, false);
+      }
+
+      setAllState(dispatch, user, isAuthenticated);
+    };
+    setUser();
+  }, []);
+
+  return <AppRoutes />;
 }
 
 export default App;
