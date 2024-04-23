@@ -9,17 +9,17 @@ import {
 } from "../controllers/transactions.js";
 import { isAuthenticated } from "../controllers/users.js";
 
-router.use("/transactions", (req, res, next) => {
+const checkIsAuthenticated = (req, res, next) => {
   try {
-    isAuthenticated(req, res);
+    const result = isAuthenticated(req, res);
     next();
   } catch (error) {
     res.status(400).send(error);
   }
-});
-router.get("/transactions", getTransactions);
-router.post("/transaction", createTransaction);
-router.patch("/update-transaction", updateTransaction);
-router.post("/delete-transaction", deleteTransaction);
+};
+router.get("/transactions", checkIsAuthenticated, getTransactions);
+router.post("/transaction", checkIsAuthenticated, createTransaction);
+router.patch("/update-transaction", checkIsAuthenticated, updateTransaction);
+router.post("/delete-transaction", checkIsAuthenticated, deleteTransaction);
 
 export { router as transactionRoutes };

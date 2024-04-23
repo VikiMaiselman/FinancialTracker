@@ -34,7 +34,7 @@ async function register(req, res, username, password, phone, useTwilio) {
     }
   }
 
-  return registerUser(req, res, username, phone, password, verification, useTwilio);
+  return await registerUser(req, res, username, phone, password, verification, useTwilio);
 }
 async function login(req, res, username, password, useTwilio) {
   let verification, userPhoneStoredInDB;
@@ -51,7 +51,7 @@ async function login(req, res, username, password, useTwilio) {
     try {
       verification = await verifyWithTwilioOTPs(userPhoneStoredInDB);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
     return res.json(verification.status);
   }
@@ -97,24 +97,23 @@ export const getAuthenticationStatus = async (req, res) => {
   res.send({ isAuthenticated: req.isAuthenticated(), user: req.user });
 };
 
-export const isAuthenticated = async (req, res) => {
+export const isAuthenticated = (req, res) => {
   try {
     if (!req.isAuthenticated()) throw new Error("User is not authenticated. Could not get the transactions.");
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
 
 export const getBalance = async (req, res) => {
-  res.send({ balance: req.user?.balance });
+  res.json(req.user?.balance);
 };
 
 export const getCategories = async (req, res) => {
-  res.send({ categories: req.user?.categories });
+  res.json(req.user?.categories);
 };
-
 
 /* Internal logic functions */
 async function verifyWithTwilioOTPs(phone) {
@@ -124,7 +123,7 @@ async function verifyWithTwilioOTPs(phone) {
       .verifications.create({ to: phone, channel: "sms" });
     return verification;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     let errMessage = error.toString();
     if (error.toString().includes("phone number is unverified")) {
       errMessage =

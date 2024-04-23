@@ -4,16 +4,15 @@ const router = express.Router();
 import { createSubcategory, deleteSubcategory } from "../controllers/subcategories.js";
 import { isAuthenticated } from "../controllers/users.js";
 
-router.use("/transactions", (req, res, next) => {
+const checkIsAuthenticated = (req, res, next) => {
   try {
-    isAuthenticated(req, res);
+    const result = isAuthenticated(req, res);
     next();
   } catch (error) {
     res.status(400).send(error);
   }
-});
-router.get("/subcat");
-router.post("/subcat", createSubcategory);
-router.post("/delete-subcat", deleteSubcategory);
+};
+router.post("/subcat", checkIsAuthenticated, createSubcategory);
+router.post("/delete-subcat", checkIsAuthenticated, deleteSubcategory);
 
 export { router as subcategoryRoutes };

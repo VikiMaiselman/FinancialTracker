@@ -1,17 +1,17 @@
 import passport from "passport";
-import { User } from "../dbs/mongo-db.js";
+import User from "./UserSchema.js";
 import { createDefaultCategoriesForUser } from "./Category.js";
 
-export const registerUser = (req, res, username, phone, password, verification, useTwilio) => {
+export const registerUser = async (req, res, username, phone, password, verification, useTwilio) => {
   User.register(
-    { username: username, phone: phone, balance: 0, transactions: [], categories: createDefaultCategoriesForUser() },
+    { username: username, phone: phone, balance: 0, transactions: [] },
     password,
     async function (err, user) {
       if (err) {
         console.error(err);
         return res.status(401).send(err);
       }
-
+      await createDefaultCategoriesForUser(user._id);
       if (useTwilio) return res.send(verification.status);
 
       passport.authenticate("local")(req, res, function () {
@@ -39,7 +39,7 @@ export const authAndStoreSession = (req, res, verificationCheck) => {
 
 export const findUserById = async (userId) => {
   try {
-    return await User.find({ _id: userId });
+    return await User.findOne({ _id: userId });
   } catch (error) {
     console.error(error);
     throw error;

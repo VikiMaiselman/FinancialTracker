@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { SubcategorySchema } from "./SubcategorySchema";
+import { SubcategorySchema } from "./SubcategorySchema.js";
 
 export const CategorySchema = new mongoose.Schema({
   name: {

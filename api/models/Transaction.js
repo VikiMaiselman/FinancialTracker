@@ -1,5 +1,8 @@
-import { Transaction, User } from "../dbs/mongo-db.js";
+import Transaction from "./TransactionSchema.js";
+import User from "./UserSchema.js";
 import { findUserById } from "./User.js";
+import mongoose from "mongoose";
+import { ObjectId } from "mongoose";
 
 // export const getTransactionsFromMongoDB = async (relevantUser) => {
 //   try {
@@ -36,33 +39,33 @@ export const getAllUserTransactions = async (userId) => {
 export const findTransactionById = async (userId, transactionId) => {
   try {
     const user = await findUserById(userId);
-    return user.transactions.find((t) => t._id === transactionId);
+    return user.transactions.find((t) => t._id.toString() === transactionId);
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const createNewTransaction = async (name, amount, categoryName, subcategoryName, date, userId) => {
+export const createNewTransaction = async (name, amount, category, subcategory, date, userId) => {
   try {
     const newTx = new Transaction({
       name: name,
       amount: amount,
-      category: categoryName,
-      subcategory: subcategoryName,
+      category: category,
+      subcategory: subcategory,
       date: date || new Date(),
     });
     // make this a single atomic transaction
     await User.findOneAndUpdate({ _id: userId }, { $push: { transactions: newTx } });
-    await updateTotalUserBalance(+amount, categoryName, userId, "add");
-    await updateCategoryTotal(+amount, categoryName, userId, "add");
+    await updateTotalUserBalance(+amount, category, userId, "add");
+    await updateCategoryTotal(+amount, category, userId, "add");
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const deleteTransaction = async (userId, transactionId) => {
+export const deleteTransactionDB = async (userId, transactionId) => {
   try {
     const transaction = await findTransactionById(userId, transactionId);
     if (!transaction) throw new Error("No such transaction. Nothing to delete");
@@ -78,12 +81,12 @@ export const deleteTransaction = async (userId, transactionId) => {
   }
 };
 
-export const updateTransaction = async (userId, transactionId, updatedFields) => {
+export const updateTransactionDB = async (userId, transactionId, updatedFields) => {
   try {
     const transaction = await findTransactionById(userId, transactionId);
     if (!transaction) throw new Error("No such transaction. Nothing to delete");
 
-    await User.findOneAndUpdate(
+    const result = await User.findOneAndUpdate(
       { _id: userId, "transactions._id": transactionId },
       {
         $set: {
@@ -105,7 +108,7 @@ export const updateTransaction = async (userId, transactionId, updatedFields) =>
   }
 };
 
-const updateTotalUserBalance = async (amount, categoryName, userId, operation) => {
+async function updateTotalUserBalance(amount, categoryName, userId, operation) {
   if (categoryName === "Expenses" && operation === "add") amount *= -1;
   if (["Savings", "Incomes"].includes(categoryName) && operation === "delete") amount *= -1;
 
@@ -115,9 +118,9 @@ const updateTotalUserBalance = async (amount, categoryName, userId, operation) =
     console.error(error);
     throw error;
   }
-};
+}
 
-const updateCategoryTotal = async (amount, categoryName, userId, operation) => {
+async function updateCategoryTotal(amount, categoryName, userId, operation) {
   if (operation === "delete") amount *= -1;
 
   try {
@@ -129,13 +132,4 @@ const updateCategoryTotal = async (amount, categoryName, userId, operation) => {
     console.error(error);
     throw error;
   }
-};
-
-// export const updateUserBalance = async (relevantUser, newBalance) => {
-//   try {
-//     await User.findOneAndUpdate({ username: relevantUser }, { balance: newBalance });
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// };
+}

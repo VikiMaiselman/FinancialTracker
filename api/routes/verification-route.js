@@ -1,5 +1,13 @@
 import express from "express";
-import { signUp, verify, logOut, getAuthenticationStatus, getBalance, isAuthenticated } from "../controllers/users.js";
+import {
+  signUp,
+  verify,
+  logOut,
+  getAuthenticationStatus,
+  getBalance,
+  isAuthenticated,
+  getCategories,
+} from "../controllers/users.js";
 
 const router = express.Router();
 
@@ -18,6 +26,6 @@ router.get("/logout", logOut);
 
 router.get("/auth-status", getAuthenticationStatus);
 router.get("/balance", checkIsAuthenticated, getBalance);
-router.get("/balance", checkIsAuthenticated, getCategories);
+router.get("/categories", checkIsAuthenticated, getCategories);
 
 export { router as verificationRoutes };

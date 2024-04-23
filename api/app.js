@@ -10,6 +10,7 @@ import passport from "passport";
 import { initDb as initializeMongoDatabase } from "./dbs/mongo-db.js";
 import { verificationRoutes } from "./routes/verification-route.js";
 import { transactionRoutes } from "./routes/transaction-route.js";
+import { subcategoryRoutes } from "./routes/subcategory-route.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -19,8 +20,8 @@ app.set("trust proxy", 1);
 // CORS (development stage only)
 app.use(
   cors({
-    // origin: "http://localhost:5173", // allows the server to accept request from React app
-    origin: "https://secureauthentication-client-production.up.railway.app",
+    origin: "http://localhost:5173", // allows the server to accept request from React app
+    // origin: "https://secureauthentication-client-production.up.railway.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // allows session cookie from browser to pass through
   })
@@ -46,10 +47,10 @@ app.use(
     saveUninitialized: false,
     cookie: {
       // uncomment for PRODUCTION
-      httpOnly: false,
-      maxAge: 1000 * 60 * 10,
-      secure: true, // set this to true if you're using https
-      sameSite: "none", // set this to 'none' if your site is served over https
+      // httpOnly: false,
+      // maxAge: 1000 * 60 * 10,
+      // secure: true, // set this to true if you're using https
+      // sameSite: "none", // set this to 'none' if your site is served over https
     },
   })
 );
@@ -62,6 +63,7 @@ initializeMongoDatabase();
 // Routes
 app.use(verificationRoutes);
 app.use(transactionRoutes);
+app.use(subcategoryRoutes);
 
 app // Listening to incoming requests
   .listen(port, "0.0.0.0", () => console.log(`Server's up. Listening on port ${port}`));

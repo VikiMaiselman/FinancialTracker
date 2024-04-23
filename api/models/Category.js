@@ -1,5 +1,6 @@
-import Category from "./CategorySchema";
-import { createSubcategoryObject } from "./Subcategory";
+import Category from "./CategorySchema.js";
+import User from "./UserSchema.js";
+import { createSubcategoryObject } from "./Subcategory.js";
 
 export const createCategoryObject = (categoryName, subcategories) => {
   return new Category({
@@ -9,11 +10,25 @@ export const createCategoryObject = (categoryName, subcategories) => {
   });
 };
 
-export const createDefaultCategoriesForUser = async () => {
+export const createDefaultCategoriesForUser = async (userId) => {
   const expenses = createExpensesCategory();
   const incomes = createIncomesCategory();
   const savings = createSavingsCategory();
-  return [expenses, incomes, savings];
+  try {
+    await User.findOneAndUpdate({ _id: userId }, { $push: { categories: { $each: [expenses, incomes, savings] } } });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const createSubcategoryForUser = async (userId) => {
+  try {
+    await User.findOneAndUpdate({ _id: userId }, { $push: { categories: { $each: [expenses, incomes, savings] } } });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 const createExpensesCategory = () => {
