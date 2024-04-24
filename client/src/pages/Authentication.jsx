@@ -1,21 +1,25 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 
-import { composeDataForBackend } from "../util/helpers.js";
-import { checkAuthStatus, getAllTransactions, getBalance, getCategories, signUp } from "../util/server-calls.js";
-// import emailValidationSchema from "../util/emailValidation.js";
-// import { isPhoneValid } from "../util/phoneValidation.js";
 import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
+
+import { composeDataForBackend } from "../util/helpers.js";
+import { checkAuthStatus, signUp } from "../util/server-calls.js";
 import { setAllState } from "../util/helpers.js";
+import ButtonMenu from "../components/ButtonMenu.jsx";
+import CustomPhoneInput from "../components/CustomPhoneInput.jsx";
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Authentication() {
-  /* state and hooks */
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  /* state */
   const [activeTab, setActiveTab] = React.useState(0);
   const [userData, setUserData] = React.useState({
     email: "",
@@ -23,24 +27,13 @@ export default function Authentication() {
     phone: "",
   });
 
-  const dispatch = useDispatch();
-
   /* error state */
   const [emailError, setEmailError] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
   const [phoneError, setPhoneError] = React.useState("");
-  const navigate = useNavigate();
-
-  /* computed values */
-  const shouldDisableButton =
-    !userData.email ||
-    (activeTab === 0 && !userData.phone) ||
-    !userData.password ||
-    Boolean(emailError) ||
-    Boolean(phoneError);
 
   /* event handlers for onChange */
   const handleChangeTab = (e, newValue) => {
-    console.log(e, newValue);
     e.preventDefault();
     setActiveTab(newValue);
   };
@@ -48,6 +41,7 @@ export default function Authentication() {
   const handleChangeUserData = (e) => {
     let name, value;
     setEmailError("");
+    setPasswordError("");
     setPhoneError("");
 
     if (typeof e === "object") {
@@ -64,11 +58,23 @@ export default function Authentication() {
     });
   };
 
-  /* event handlers for validation */
+  /* validation */
   const handleEmailBlur = () => {
-    const email = userData.email;
-    // emailValidationSchema.validate({ email }).catch((error) => setEmailError(error.message));
+    if (userData.email.trim() === "") setEmailError("Error: required field");
+    if (!emailPattern.test(userData.email)) setEmailError("Error: provide a valid email");
   };
+  const handlePasswordBlur = () => {
+    if (userData.password.trim() === "") setPasswordError("Error: required field");
+    if (userData.password.trim().length < 3)
+      setPasswordError("Error: your password should be at least 3 characters long");
+  };
+
+  const shouldDisableButton =
+    !userData.email ||
+    (activeTab === 0 && !userData.phone) ||
+    !userData.password ||
+    Boolean(passwordError) ||
+    Boolean(phoneError);
 
   /* event handlers for onClick */
   const handleClick = async (e) => {
@@ -108,19 +114,27 @@ export default function Authentication() {
       <div className="flex-1 h-screen flex flex-col justify-center gap-5 py-12 px-12 text-center">
         <h2 className="mb-8 font-bold uppercase md:text-5xl text-stone-900">Money Tracker</h2>
         <h2 className="mb-8 font-semibold md:text-xl text-stone-900">
-          Register or Log In to see your current financial state
+          Sign Up or Log In to see your current financial state
         </h2>
 
         <form>
           <div>
-            <menu value={activeTab}>
-              <Button id="signup" onClick={(e) => handleChangeTab(e, 0)}>
+            <ButtonMenu value={activeTab}>
+              <button
+                className="my-4 text-stone-900 border-b-stone-300 border-b-2 focus:border-b-stone-700"
+                id="signup"
+                onClick={(e) => handleChangeTab(e, 0)}
+              >
                 Sign Up
-              </Button>
-              <Button id="signin" onClick={(e) => handleChangeTab(e, 1)}>
+              </button>
+              <button
+                className="my-4 text-stone-900 border-b-stone-300 border-b-2 focus:border-b-stone-700"
+                id="signin"
+                onClick={(e) => handleChangeTab(e, 1)}
+              >
                 Sign In
-              </Button>
-            </menu>
+              </button>
+            </ButtonMenu>
           </div>
 
           <Input
@@ -128,10 +142,8 @@ export default function Authentication() {
             onChange={handleChangeUserData}
             name="email"
             value={userData.email}
-            label="Email"
+            label={emailError ? emailError : "Email"}
             onBlur={handleEmailBlur}
-            error={Boolean(emailError)}
-            // helperText={emailError}
           />
 
           <Input
@@ -139,46 +151,27 @@ export default function Authentication() {
             type="password"
             onChange={handleChangeUserData}
             name="password"
-            label="Password"
             value={userData.password}
+            label={passwordError ? passwordError : "Password"}
+            onBlur={handlePasswordBlur}
           />
 
           {!activeTab && (
-            <>
-              <label htmlFor="phone" className="text-sm font-bold uppercase text-stone-500">
-                Phone Number
-              </label>
-              <PhoneInput
-                id="phone"
-                country={"il"}
-                inputStyle={{
-                  width: "100%",
-                  background: "rgb(231 229 228)",
-                  color: "rgb(87 83 78)",
-                  borderBottom: "2px solid rgb(214 211 209)",
-                  "&:focus": {
-                    borderBottom: "2px solid rgb(87 83 78)",
-                  },
-                }}
-                style={{
-                  marginBottom: "2em",
-                }}
-                onChange={handleChangeUserData}
-                name="phone"
-                value={userData.phone}
-                // isValid={(value) => isPhoneValid(value, setPhoneError)}
-                defaultErrorMessage={phoneError}
-              />
-            </>
+            <CustomPhoneInput
+              phoneVal={userData.phone}
+              handleChange={handleChangeUserData}
+              setPhoneError={setPhoneError}
+              label={phoneError ? phoneError : "Phone Number"}
+            />
           )}
-
-          <Button onClick={handleClick} disabled={shouldDisableButton}>
-            {activeTab === 0 ? "Sign Up" : "Sign In"}
-          </Button>
-          {/* <PaleStyledButton variant="contained" size="small" onClick={handleClickNoTwilio} disabled={!isTwilioError}> */}
-          <Button size="small" onClick={handleClickNoTwilio} disabled={shouldDisableButton}>
-            {activeTab === 0 ? "Sign Up (no Twilio)" : "Sign In (no Twilio)"}
-          </Button>
+          <ButtonMenu>
+            <Button onClick={handleClick} disabled={shouldDisableButton}>
+              {activeTab === 0 ? "Sign Up" : "Sign In"}
+            </Button>
+            <Button size="small" onClick={handleClickNoTwilio} disabled={shouldDisableButton}>
+              {activeTab === 0 ? "Sign Up (no Twilio)" : "Sign In (no Twilio)"}
+            </Button>
+          </ButtonMenu>
         </form>
       </div>
 

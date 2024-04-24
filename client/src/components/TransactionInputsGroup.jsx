@@ -1,5 +1,5 @@
-import { useState } from "react";
 import Input from "./Input";
+import { UTCtoGMT } from "../util/helpers";
 
 export default function TransactionInputsGroup({ transaction, categories, setState, isUpdate = false }) {
   const handleChange = (e) => {
@@ -10,6 +10,14 @@ export default function TransactionInputsGroup({ transaction, categories, setSta
   const handleFocus = (e) => {
     e.target.value = "";
   };
+
+  let date;
+  if (transaction.date.toString().endsWith("Z")) {
+    date = UTCtoGMT(transaction.date);
+  } else {
+    date = UTCtoGMT(transaction.date.toISOString());
+  }
+  const formattedDate = new Date(date).toISOString().split("T")[0];
 
   return (
     <>
@@ -39,15 +47,8 @@ export default function TransactionInputsGroup({ transaction, categories, setSta
         options={categories?.find((c) => c.name === transaction.category)?.subcategories}
         onChange={handleChange}
         onFocus={handleFocus}
-        disabled={isUpdate}
       />
-      <Input
-        name="date"
-        type="date"
-        value={transaction.date}
-        placeholder="Set a date optionally"
-        onChange={handleChange}
-      />
+      <Input name="date" type="date" value={formattedDate} onChange={handleChange} />
     </>
   );
 }

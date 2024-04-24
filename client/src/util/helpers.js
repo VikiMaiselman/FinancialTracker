@@ -1,7 +1,3 @@
-import axios from "axios";
-
-import Swal from "sweetalert2";
-
 export function composeDataForBackend(userData, activeTab, useTwilio = true) {
   return {
     ...userData,
@@ -71,6 +67,49 @@ export const setCategoriesState = (fn, user) => {
     type: "SET_CATEGORIES",
     payload: user.categories,
   });
+};
+
+export const UTCtoGMT = (inputDateString) => {
+  const dateObject = new Date(inputDateString);
+  const timeZoneOffsetInMinutes = dateObject.getTimezoneOffset();
+
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const dayOfWeek = daysOfWeek[dateObject.getUTCDay()];
+  const month = months[dateObject.getUTCMonth()];
+  const day = dateObject.getUTCDate();
+  const year = dateObject.getUTCFullYear();
+  const hours = dateObject.getUTCHours();
+  const minutes = ("0" + dateObject.getUTCMinutes()).slice(-2);
+  const seconds = ("0" + dateObject.getUTCSeconds()).slice(-2);
+
+  // Convert the offset to hours and minutes format
+  const sign = timeZoneOffsetInMinutes > 0 ? "+" : "-";
+  const hoursOffset = Math.floor(Math.abs(timeZoneOffsetInMinutes) / 60);
+  const minutesOffset = ("0" + (Math.abs(timeZoneOffsetInMinutes) % 60)).slice(-2);
+  const timeZoneOffset = sign + ("0" + hoursOffset).slice(-2) + minutesOffset;
+
+  // Construct the formatted date string
+  const formattedDateString =
+    dayOfWeek +
+    " " +
+    month +
+    " " +
+    day +
+    " " +
+    year +
+    " " +
+    hours +
+    ":" +
+    minutes +
+    ":" +
+    seconds +
+    " GMT" +
+    timeZoneOffset +
+    " (Israel Daylight Time)";
+
+  return formattedDateString;
 };
 
 export const setAllState = (fn, user, isAuthenticated) => {
