@@ -17,24 +17,17 @@ export default function CreateTransaction() {
     subcategory: "",
     date: new Date(),
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState(true);
 
   const validate = () => {
     for (const val of Object.values(newTransaction)) {
-      if (val.toString().trim() === "") return false;
+      if (val.toString().trim() === "") return true;
     }
-    return true;
+    return false;
   };
 
   const handleCreateTransaction = async (e) => {
     e.preventDefault();
-
-    const isValid = validate();
-    if (!isValid) {
-      setError("You should not leave empty fields.");
-      fireAlert("You shouldn't leave empty fields.", true);
-      return;
-    }
 
     const wasSuccess = await createTransaction(newTransaction);
     if (!wasSuccess) return;
@@ -54,9 +47,16 @@ export default function CreateTransaction() {
     <>
       <h2 className="text-xl font-bold text-stone-700 mt-4">Create New Transaction</h2>
       <form className="w-full flex flex-col 2xl:flex-row justify-around items-center gap-3 px-4 py-2 my-1 text-sm md:text-base rounded-md bg-stone-700 text-stone-400">
-        <TransactionInputsGroup transaction={newTransaction} categories={categories} setState={setNewTransaction} />
+        <TransactionInputsGroup
+          transaction={newTransaction}
+          categories={categories}
+          setState={setNewTransaction}
+          setErrorState={setError}
+        />
         <p className="flex flex-col gap-1 my-2">
-          <Button onClick={handleCreateTransaction}>Save</Button>
+          <Button onClick={handleCreateTransaction} disabled={error || validate()}>
+            Save
+          </Button>
         </p>
       </form>
     </>

@@ -2,11 +2,10 @@ import { useDispatch } from "react-redux";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateTransaction from "./UpdateTransaction";
-import Button from "./elements/Button";
-
-import { setAllMoneyState, setBalanceState, setTransactionsState } from "../util/helpers";
-import { checkAuthStatus, deleteTransaction } from "../util/server-calls";
 import AlertDialogCustom from "./elements/AlertDialogCustom";
+
+import { setAllMoneyState } from "../util/helpers";
+import { checkAuthStatus, deleteTransaction } from "../util/server-calls";
 
 export default function Transaction({ tx }) {
   const dispatch = useDispatch();

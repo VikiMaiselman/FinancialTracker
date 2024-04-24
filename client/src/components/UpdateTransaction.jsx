@@ -6,7 +6,7 @@ import TransactionInputsGroup from "./TransactionInputsGroup.jsx";
 import DialogCustom from "./elements/DialogCustom.jsx";
 
 import { checkAuthStatus, updateTransaction } from "../util/server-calls";
-import { fireAlert, setAllMoneyState, setBalanceState, setTransactionsState } from "../util/helpers";
+import { setAllMoneyState } from "../util/helpers";
 
 export default function UpdateTransaction({ transaction }) {
   const dispatch = useDispatch();
@@ -22,21 +22,8 @@ export default function UpdateTransaction({ transaction }) {
   });
   const [error, setError] = useState("");
 
-  const validate = () => {
-    for (const val of Object.values(updTransaction)) {
-      if (val.toString().trim() === "") return false;
-    }
-    return true;
-  };
-
   const handleUpdateTransaction = async (e) => {
     e.preventDefault();
-    const isValid = validate();
-    if (!isValid) {
-      setError("You shouldn't leave empty fields.");
-      fireAlert("You shouldn't leave empty fields.", true);
-      return;
-    }
 
     const wasSuccess = await updateTransaction(updTransaction);
     if (!wasSuccess) return;
@@ -46,11 +33,12 @@ export default function UpdateTransaction({ transaction }) {
   };
 
   return (
-    <DialogCustom onClick={handleUpdateTransaction} icon={<EditIcon />}>
+    <DialogCustom onClick={handleUpdateTransaction} icon={<EditIcon />} isError={error}>
       <TransactionInputsGroup
         transaction={updTransaction}
         categories={categories}
         setState={setUpdTransaction}
+        setErrorState={setError}
         isUpdate={true}
       />
       <p>* - required</p>
