@@ -114,7 +114,7 @@ export const updateTransactionDB = async (userId, transactionId, updatedFields) 
       session = await db.startSession();
       await session.withTransaction(async () => {
         await updateTotalUserBalance(+delta, transaction.category, userId, "add", session);
-        await updateCategoryTotal(+delta, transaction, userId, "add", session);
+        await updateCategoryTotal(+delta, transaction.category, userId, "add", session);
       });
     }
   } catch (error) {
@@ -141,7 +141,7 @@ async function updateCategoryTotal(amount, categoryName, userId, operation, sess
   if (operation === "delete") amount *= -1;
 
   try {
-    await User.findOneAndUpdate(
+    const result = await User.findOneAndUpdate(
       { _id: userId, "categories.name": categoryName },
       { $inc: { "categories.$.total": amount } },
       { session }
