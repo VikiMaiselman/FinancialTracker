@@ -8,7 +8,7 @@ export const createSubcategory = async (req, res) => {
     return res.send("Subcategory successfully created.");
   } catch (error) {
     console.error(error);
-    return res.status(400).send(error);
+    return res.status(400).json({ error: "Could not create the subcategory" });
   }
 };
 
@@ -19,6 +19,6 @@ export const deleteSubcategory = async (req, res) => {
     return res.send("Subcategory successfully deleted.");
   } catch (error) {
     console.error(error);
-    return res.status(400).send(error);
+    return res.status(400).json({ error: "Could not delete the subcategory" });
   }
 };

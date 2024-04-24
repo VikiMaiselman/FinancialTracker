@@ -1,8 +1,7 @@
+import { db } from "../dbs/mongo-db.js";
 import Transaction from "./TransactionSchema.js";
 import User from "./UserSchema.js";
 import { findUserById } from "./User.js";
-import mongoose from "mongoose";
-import { ObjectId } from "mongoose";
 
 // export const getTransactionsFromMongoDB = async (relevantUser) => {
 //   try {
@@ -47,46 +46,58 @@ export const findTransactionById = async (userId, transactionId) => {
 };
 
 export const createNewTransaction = async (name, amount, category, subcategory, date, userId) => {
+  const newTx = new Transaction({
+    name: name,
+    amount: amount,
+    category: category,
+    subcategory: subcategory,
+    date: date || new Date(),
+  });
+
+  // make this a single atomic transaction
+  const session = await db.startSession();
   try {
-    const newTx = new Transaction({
-      name: name,
-      amount: amount,
-      category: category,
-      subcategory: subcategory,
-      date: date || new Date(),
+    await session.withTransaction(async () => {
+      await User.findOneAndUpdate({ _id: userId }, { $push: { transactions: newTx } }, { session });
+      await updateTotalUserBalance(+amount, category, userId, "add", session);
+      await updateCategoryTotal(+amount, category, userId, "add", session);
     });
-    // make this a single atomic transaction
-    await User.findOneAndUpdate({ _id: userId }, { $push: { transactions: newTx } });
-    await updateTotalUserBalance(+amount, category, userId, "add");
-    await updateCategoryTotal(+amount, category, userId, "add");
   } catch (error) {
     console.error(error);
     throw error;
+  } finally {
+    await session.endSession();
   }
 };
 
 export const deleteTransactionDB = async (userId, transactionId) => {
+  let session;
   try {
     const transaction = await findTransactionById(userId, transactionId);
     if (!transaction) throw new Error("No such transaction. Nothing to delete");
-
     const amount = +transaction.amount;
-    // should be atomic
-    await User.findOneAndUpdate({ _id: userId }, { $pull: { transactions: { _id: transactionId } } });
-    await updateTotalUserBalance(+amount, transaction.category, userId, "delete");
-    await updateCategoryTotal(+amount, transaction.category, userId, "delete");
+
+    session = await db.startSession();
+    await session.withTransaction(async () => {
+      await User.findOneAndUpdate({ _id: userId }, { $pull: { transactions: { _id: transactionId } } }, { session });
+      await updateTotalUserBalance(+amount, transaction.category, userId, "delete", session);
+      await updateCategoryTotal(+amount, transaction.category, userId, "delete", session);
+    });
   } catch (error) {
     console.error(error);
     throw error;
+  } finally {
+    await session.endSession();
   }
 };
 
 export const updateTransactionDB = async (userId, transactionId, updatedFields) => {
+  let session;
   try {
     const transaction = await findTransactionById(userId, transactionId);
     if (!transaction) throw new Error("No such transaction. Nothing to delete");
 
-    const result = await User.findOneAndUpdate(
+    await User.findOneAndUpdate(
       { _id: userId, "transactions._id": transactionId },
       {
         $set: {
@@ -99,34 +110,41 @@ export const updateTransactionDB = async (userId, transactionId, updatedFields) 
       const prevAmount = transaction.amount;
       const newAmount = updatedFields.amount;
       const delta = +newAmount - +prevAmount;
-      await updateTotalUserBalance(+delta, transaction.category, userId, "add");
-      await updateCategoryTotal(+delta, transaction, userId, "add");
+
+      session = await db.startSession();
+      await session.withTransaction(async () => {
+        await updateTotalUserBalance(+delta, transaction.category, userId, "add", session);
+        await updateCategoryTotal(+delta, transaction, userId, "add", session);
+      });
     }
   } catch (error) {
     console.error(error);
     throw error;
+  } finally {
+    await session.endSession();
   }
 };
 
-async function updateTotalUserBalance(amount, categoryName, userId, operation) {
+async function updateTotalUserBalance(amount, categoryName, userId, operation, session) {
   if (categoryName === "Expenses" && operation === "add") amount *= -1;
   if (["Savings", "Incomes"].includes(categoryName) && operation === "delete") amount *= -1;
 
   try {
-    await User.findOneAndUpdate({ _id: userId }, { $inc: { balance: amount } });
+    await User.findOneAndUpdate({ _id: userId }, { $inc: { balance: amount } }, { session });
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
 
-async function updateCategoryTotal(amount, categoryName, userId, operation) {
+async function updateCategoryTotal(amount, categoryName, userId, operation, session) {
   if (operation === "delete") amount *= -1;
 
   try {
     await User.findOneAndUpdate(
       { _id: userId, "categories.name": categoryName },
-      { $inc: { "categories.$.total": amount } }
+      { $inc: { "categories.$.total": amount } },
+      { session }
     );
   } catch (error) {
     console.error(error);

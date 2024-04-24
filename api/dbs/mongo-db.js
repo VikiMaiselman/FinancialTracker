@@ -8,8 +8,8 @@ let Transaction, User, Subcategory, Category, db;
 /* ************ C O N F I G U R E   D A T A B A S E ************ */
 async function initDb() {
   try {
-    // db = await mongoose.connect(process.env.DB_ATLAS_URL);
-    db = await mongoose.connect("mongodb://localhost:27017/FinTrack");
+    db = await mongoose.connect(process.env.DB_ATLAS_URL);
+    // db = await mongoose.connect("mongodb://localhost:27017/FinTrack");
   } catch (error) {
     console.error("Connection with database could not be established", error);
   }

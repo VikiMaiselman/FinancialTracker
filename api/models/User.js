@@ -9,7 +9,7 @@ export const registerUser = async (req, res, username, phone, password, verifica
     async function (err, user) {
       if (err) {
         console.error(err);
-        return res.status(401).send(err);
+        return res.status(401).json({ error: err.message });
       }
       await createDefaultCategoriesForUser(user._id);
       if (useTwilio) return res.send(verification.status);

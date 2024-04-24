@@ -25,12 +25,7 @@ export const createSubcategoryForUser = async (name, color, userId, categoryName
 
 export const deleteSubcategoryFromUser = async (userId, subcatId) => {
   try {
-    await User.findOneAndUpdate(
-      { _id: userId },
-      { $pull: { "categories.$.subcategories": { _id: subcatId } } }
-      // { $pull: { "categories.$[category].subcategories": { _id: subcatId } } },
-      // { arrayFilters: [{ "category.name": categoryName }] }
-    );
+    await User.findOneAndUpdate({ _id: userId }, { $pull: { "categories.$.subcategories": { _id: subcatId } } });
   } catch (error) {
     console.error(error);
     return res.status(400).json("Could not delete the category. Try again later or contact the support.");

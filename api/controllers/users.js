@@ -19,10 +19,10 @@ async function register(req, res, username, password, phone, useTwilio) {
 
   try {
     const result = await authenticateUser(username, password);
-    if (!result.error) throw "The user already exists. You can't register twice.";
+    if (!result.error) throw new Error("The user already exists. You can't register twice.");
   } catch (error) {
     console.error(error);
-    if (!error.startsWith("The user already exists")) return res.status(400).json(error);
+    if (!error.startsWith("The user already exists")) return res.status(400).json({ error: error.message });
     // else we can proceed to register the user
   }
 
@@ -30,7 +30,7 @@ async function register(req, res, username, password, phone, useTwilio) {
     try {
       verification = await verifyWithTwilioOTPs(phone);
     } catch (error) {
-      return res.status(400).send(error);
+      return res.status(400).send(error.message);
     }
   }
 
@@ -44,7 +44,7 @@ async function login(req, res, username, password, useTwilio) {
     userPhoneStoredInDB = result.user.phone;
     if (result.error) throw result.error; // no user found
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(400).json({ error: error.message });
   }
 
   if (useTwilio) {
@@ -76,7 +76,7 @@ export const verify = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    return res.status(401).send(error.toString());
+    return res.status(401).json({ error: error.toString() });
   }
 
   authAndStoreSession(req, res, verificationCheck);
@@ -99,10 +99,10 @@ export const getAuthenticationStatus = async (req, res) => {
 
 export const isAuthenticated = (req, res) => {
   try {
-    if (!req.isAuthenticated()) throw new Error("User is not authenticated. Could not get the transactions.");
+    if (!req.isAuthenticated()) throw new Error("User is not authenticated. Could not do actions with transactions.");
     return true;
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     throw error;
   }
 };
@@ -125,7 +125,7 @@ async function verifyWithTwilioOTPs(phone) {
   } catch (error) {
     console.error(error);
     let errMessage = error.toString();
-    if (error.toString().includes("phone number is unverified")) {
+    if (errMessage.includes("phone number is unverified")) {
       errMessage =
         "Your number isn't verified with my Twilio account. Either try to use my phone number (but it is me who will get the verification code) or authenticate w/o Twilio (the button is now available). For more options check my README.md";
     }

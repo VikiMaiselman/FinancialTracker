@@ -11,10 +11,10 @@ import { isAuthenticated } from "../controllers/users.js";
 
 const checkIsAuthenticated = (req, res, next) => {
   try {
-    const result = isAuthenticated(req, res);
+    isAuthenticated(req, res);
     next();
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).json({ error: error.message });
   }
 };
 router.get("/transactions", checkIsAuthenticated, getTransactions);
