@@ -2,8 +2,8 @@ import { useSelector } from "react-redux";
 
 import CreateTransaction from "../components/CreateTransaction";
 import TransactionsContainer from "../components/TransactionsContainer";
-import BreakLine from "../components/BreakLine.jsx";
-import CustomBarChart from "../components/CustomBarChart";
+import BreakLine from "../components/elements/BreakLine.jsx";
+import CustomBarChart from "../components/charts/CustomBarChart";
 
 export default function Dashboard() {
   const transactions = useSelector((state) => state.transactions);
@@ -13,9 +13,6 @@ export default function Dashboard() {
   const incomes = transactions?.filter((t) => t.category === "Incomes");
   const savings = transactions?.filter((t) => t.category === "Savings");
 
-  //   useEffect(() => {
-  //     const synchronizeDataWithBackend =
-  //   })
   return (
     <div className="w-full mx-10 px-8 flex flex-col gap-5">
       <h2 className="mb-6 font-bold uppercase md:text-4xl text-stone-900 tracking-wide">All Transactions</h2>

@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import EditIcon from "@mui/icons-material/Edit";
 import TransactionInputsGroup from "./TransactionInputsGroup.jsx";
-import DialogCustom from "./DialogCustom";
+import DialogCustom from "./elements/DialogCustom.jsx";
 
 import { checkAuthStatus, updateTransaction } from "../util/server-calls";
-import { setBalanceState, setTransactionsState } from "../util/helpers";
-import Swal from "sweetalert2";
+import { fireAlert, setAllMoneyState, setBalanceState, setTransactionsState } from "../util/helpers";
 
 export default function UpdateTransaction({ transaction }) {
   const dispatch = useDispatch();
@@ -35,20 +34,15 @@ export default function UpdateTransaction({ transaction }) {
     const isValid = validate();
     if (!isValid) {
       setError("You shouldn't leave empty fields.");
-      return Swal.fire({
-        title: "Ooops...",
-        text: error,
-        icon: "error",
-        confirmButtonText: "Please, try again.",
-        confirmButtonColor: "rgb(68 64 60)",
-        color: "color: rgb(168 162 158)",
-        iconColor: "red",
-      });
+      fireAlert("You shouldn't leave empty fields.", true);
+      return;
     }
-    await updateTransaction(updTransaction);
+
+    const wasSuccess = await updateTransaction(updTransaction);
+    if (!wasSuccess) return;
+
     const { user } = await checkAuthStatus();
-    setBalanceState(dispatch, user);
-    setTransactionsState(dispatch, user);
+    setAllMoneyState(dispatch, user);
   };
 
   return (
@@ -59,6 +53,7 @@ export default function UpdateTransaction({ transaction }) {
         setState={setUpdTransaction}
         isUpdate={true}
       />
+      <p>* - required</p>
     </DialogCustom>
   );
 }

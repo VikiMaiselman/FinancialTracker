@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Swal from "sweetalert2";
 
-import Button from "./Button";
-import Input from "./Input";
-import { checkAuthStatus, createTransaction, getAllTransactions, getBalance } from "../util/server-calls.js";
-import { setBalanceState, setTransactionsState } from "../util/helpers";
+import Button from "./elements/Button";
+import { checkAuthStatus, createTransaction } from "../util/server-calls.js";
+import { fireAlert, setAllMoneyState, setBalanceState, setTransactionsState } from "../util/helpers";
 import TransactionInputsGroup from "./TransactionInputsGroup";
 
 export default function CreateTransaction() {
@@ -30,24 +28,19 @@ export default function CreateTransaction() {
 
   const handleCreateTransaction = async (e) => {
     e.preventDefault();
+
     const isValid = validate();
     if (!isValid) {
-      setError("Fill in all the fields.");
-      return Swal.fire({
-        title: "Ooops...",
-        text: error,
-        icon: "error",
-        confirmButtonText: "Please, try again.",
-        confirmButtonColor: "rgb(68 64 60)",
-        color: "color: rgb(168 162 158)",
-        iconColor: "red",
-      });
+      setError("You should not leave empty fields.");
+      fireAlert("You shouldn't leave empty fields.", true);
+      return;
     }
 
-    await createTransaction(newTransaction);
+    const wasSuccess = await createTransaction(newTransaction);
+    if (!wasSuccess) return;
+
     const { user } = await checkAuthStatus();
-    setBalanceState(dispatch, user);
-    setTransactionsState(dispatch, user);
+    setAllMoneyState(dispatch, user);
     setNewTransaction({
       name: "",
       amount: "",

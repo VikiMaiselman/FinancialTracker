@@ -2,6 +2,7 @@ import React from "react";
 import Transaction from "./Transaction";
 
 export default function TransactionsContainer({ categoryName, txs, categoryFullObject = null }) {
+  console.log(categoryFullObject);
   const categoryHeader = categoryFullObject
     ? `Total ${categoryName}: ${categoryFullObject.total} ₪`
     : `My ${categoryName}`;

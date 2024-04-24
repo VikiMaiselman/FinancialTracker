@@ -2,8 +2,8 @@ import { useSelector } from "react-redux";
 
 import CreateTransaction from "../components/CreateTransaction";
 import TransactionsContainer from "../components/TransactionsContainer";
-import BreakLine from "../components/BreakLine";
-import CustomPieChart from "../components/CustomPieChart";
+import BreakLine from "../components/elements/BreakLine";
+import CustomPieChart from "../components/charts/CustomPieChart";
 import { filterTransactionsPerSubcategory } from "../util/helpers";
 
 export default function CategoryTransactions({ categoryName }) {

@@ -2,10 +2,11 @@ import { useDispatch } from "react-redux";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateTransaction from "./UpdateTransaction";
-import Button from "./Button";
+import Button from "./elements/Button";
 
-import { setBalanceState, setTransactionsState } from "../util/helpers";
+import { setAllMoneyState, setBalanceState, setTransactionsState } from "../util/helpers";
 import { checkAuthStatus, deleteTransaction } from "../util/server-calls";
+import AlertDialogCustom from "./elements/AlertDialogCustom";
 
 export default function Transaction({ tx }) {
   const dispatch = useDispatch();
@@ -16,10 +17,11 @@ export default function Transaction({ tx }) {
   });
 
   const handleDeleteTransaction = async (e) => {
-    await deleteTransaction(tx._id);
+    const wasSuccess = await deleteTransaction(tx._id);
+    if (!wasSuccess) return;
+
     const { user } = await checkAuthStatus();
-    setBalanceState(dispatch, user);
-    setTransactionsState(dispatch, user);
+    setAllMoneyState(dispatch, user);
   };
   return (
     <>
@@ -30,9 +32,7 @@ export default function Transaction({ tx }) {
         <p className="w-full min-w-12 overflow-scroll">{tx?.subcategory}</p>
         <menu className="w-full flex items-center justify-center gap-4 my-4">
           <li>
-            <Button onClick={handleDeleteTransaction}>
-              <DeleteIcon />
-            </Button>
+            <AlertDialogCustom btnLabel={<DeleteIcon />} onDelete={handleDeleteTransaction} />
           </li>
           <li>
             <UpdateTransaction transaction={tx} />

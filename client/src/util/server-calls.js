@@ -2,6 +2,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 import { URL, HEADERS } from "./config.js";
+import { fireAlert } from "./helpers.js";
 
 export async function signUp(data) {
   try {
@@ -16,6 +17,8 @@ export async function signUp(data) {
     ) {
       cancelText = "Authenticate w/o OTP (this will still be safe)";
     }
+    // fireAlert("There was an internal problem with Twilio Validation", true);
+    // return false;
     return Swal.fire({
       title: "Ooops...",
       text: error.response.data?.message || error.response.data?.error,
@@ -34,15 +37,8 @@ export async function verifyUser(fullData) {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return;
   }
 }
 
@@ -51,15 +47,8 @@ export async function logout() {
     await axios.get(`${URL}/logout`, { withCredentials: true }, HEADERS);
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return;
   }
 }
 
@@ -69,15 +58,8 @@ export async function checkAuthStatus() {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return;
   }
 }
 
@@ -87,15 +69,8 @@ export async function getBalance() {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return;
   }
 }
 
@@ -105,15 +80,8 @@ export async function getCategories() {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return;
   }
 }
 
@@ -123,15 +91,8 @@ export async function getAllTransactions() {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return false;
   }
 }
 
@@ -141,15 +102,8 @@ export async function createTransaction(tx) {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return false;
   }
 }
 
@@ -159,15 +113,8 @@ export async function updateTransaction(updatedFields) {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return false;
   }
 }
 
@@ -182,15 +129,8 @@ export async function deleteTransaction(txId) {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return false;
   }
 }
 
@@ -200,15 +140,8 @@ export async function createSubcategory(subcategory) {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return false;
   }
 }
 
@@ -218,14 +151,7 @@ export async function deleteSubcategory(subcatId) {
     return result.data;
   } catch (error) {
     console.error(error);
-    return Swal.fire({
-      title: "Ooops...",
-      text: error.response.data.error,
-      icon: "error",
-      confirmButtonText: "Please, try again.",
-      confirmButtonColor: "rgb(68 64 60)",
-      color: "color: rgb(168 162 158)",
-      iconColor: "red",
-    });
+    fireAlert(error.response.data.error, true);
+    return false;
   }
 }

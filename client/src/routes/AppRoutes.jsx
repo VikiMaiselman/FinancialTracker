@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import MainLayout from "../components/MainLayout.jsx";
+import MainLayout from "../components/layouts/MainLayout.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import CategoryTransactions from "../pages/CategoryTransactions.jsx";
 import Authentication from "../pages/Authentication.jsx";

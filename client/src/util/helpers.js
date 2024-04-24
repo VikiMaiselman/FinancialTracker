@@ -1,3 +1,5 @@
+import Swal from "sweetalert2";
+
 export function composeDataForBackend(userData, activeTab, useTwilio = true) {
   return {
     ...userData,
@@ -63,10 +65,24 @@ export const setTransactionsState = (fn, user) => {
 };
 
 export const setCategoriesState = (fn, user) => {
+  console.log(user.categories);
   fn({
     type: "SET_CATEGORIES",
     payload: user.categories,
   });
+};
+
+export const setAllState = (fn, user, isAuthenticated) => {
+  setUserAuthState(fn, user, isAuthenticated);
+  setBalanceState(fn, user);
+  setTransactionsState(fn, user);
+  setCategoriesState(fn, user);
+};
+
+export const setAllMoneyState = (fn, user) => {
+  setBalanceState(fn, user);
+  setTransactionsState(fn, user);
+  setCategoriesState(fn, user);
 };
 
 export const UTCtoGMT = (inputDateString) => {
@@ -112,9 +128,14 @@ export const UTCtoGMT = (inputDateString) => {
   return formattedDateString;
 };
 
-export const setAllState = (fn, user, isAuthenticated) => {
-  setUserAuthState(fn, user, isAuthenticated);
-  setBalanceState(fn, user);
-  setTransactionsState(fn, user);
-  setCategoriesState(fn, user);
+export const fireAlert = (text, isErrorAlert) => {
+  Swal.fire({
+    title: "Ooops...",
+    text: text,
+    icon: isErrorAlert ? "error" : "success",
+    confirmButtonText: "Please, try again.",
+    confirmButtonColor: "rgb(68 64 60)",
+    color: "color: rgb(168 162 158)",
+    iconColor: isErrorAlert ? "red" : "green",
+  });
 };

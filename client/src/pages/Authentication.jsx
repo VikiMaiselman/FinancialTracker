@@ -4,14 +4,14 @@ import { useDispatch } from "react-redux";
 
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 
-import Input from "../components/Input.jsx";
-import Button from "../components/Button.jsx";
+import Input from "../components/elements/Input.jsx";
+import Button from "../components/elements/Button.jsx";
 
 import { composeDataForBackend } from "../util/helpers.js";
 import { checkAuthStatus, signUp } from "../util/server-calls.js";
 import { setAllState } from "../util/helpers.js";
-import ButtonMenu from "../components/ButtonMenu.jsx";
-import CustomPhoneInput from "../components/CustomPhoneInput.jsx";
+import ButtonMenu from "../components/elements/ButtonMenu.jsx";
+import CustomPhoneInput from "../components/elements/CustomPhoneInput.jsx";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

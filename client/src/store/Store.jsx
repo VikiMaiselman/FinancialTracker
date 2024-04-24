@@ -1,8 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
-import React, { useEffect } from "react";
-
-import { checkAuthStatus } from "../util/server-calls.js";
+import React from "react";
 
 const initialState = {
   user: {

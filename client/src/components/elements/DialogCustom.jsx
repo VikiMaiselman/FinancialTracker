@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import Button from "./Button";
 
-export default function DialogCustom({ children, onClick, icon }) {
+export default function DialogCustom({ children, onClick, icon, isError = false }) {
   const [open, setOpen] = useState(false);
 
   const handleClick = (e) => {
@@ -31,7 +31,9 @@ export default function DialogCustom({ children, onClick, icon }) {
         </DialogHeader>
         <div className="grid gap-4 py-4">{children}</div>
         <DialogFooter>
-          <Button onClick={handleClick}>Save changes</Button>
+          <Button onClick={handleClick} disabled={isError}>
+            Save changes
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
