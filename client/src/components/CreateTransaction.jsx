@@ -35,7 +35,7 @@ export default function CreateTransaction() {
       setError("Fill in all the fields.");
       return Swal.fire({
         title: "Ooops...",
-        text: "Fill in all the fields.",
+        text: error,
         icon: "error",
         confirmButtonText: "Please, try again.",
         confirmButtonColor: "rgb(68 64 60)",
