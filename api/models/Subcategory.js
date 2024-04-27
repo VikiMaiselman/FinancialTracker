@@ -38,7 +38,7 @@ export const findSubcategoryByName = async (userId, categoryName, subcategoryNam
     const category = user.categories.find((c) => c.name === categoryName);
     const subcategory = category.subcategories.find((s) => s.name === subcategoryName);
 
-    if (!subcategory) throw new Error("There was no such subcategory found associated with this user.");
+    if (!subcategory) return null;
     return subcategory;
   } catch (error) {
     console.error(error);
