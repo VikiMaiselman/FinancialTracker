@@ -6,7 +6,9 @@ export default function Input({ label, list = "", options = null, ...props }) {
   return (
     <p className="flex flex-col gap-1 my-2 w-full">
       <label
-        className={`text-sm font-bold uppercase ${label?.startsWith("Error") ? "text-red-500" : "text-stone-500"}`}
+        className={`font-bold ${
+          label?.startsWith("Error") ? "text-red-500 text-xs" : "text-stone-500 text-sm uppercase"
+        }`}
       >
         {label}
       </label>

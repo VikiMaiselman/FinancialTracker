@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import Button from "./Button";
 
-export default function DialogCustom({ children, onClick, icon, isError = false }) {
+export default function DialogCustom({ children, onClick, icon, title, isError = false }) {
   const [open, setOpen] = useState(false);
 
   const handleClick = (e) => {
@@ -26,7 +26,7 @@ export default function DialogCustom({ children, onClick, icon, isError = false 
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Transaction</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogDescription>Click save when you're done.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">{children}</div>

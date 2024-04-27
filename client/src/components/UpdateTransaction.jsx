@@ -33,7 +33,7 @@ export default function UpdateTransaction({ transaction }) {
   };
 
   return (
-    <DialogCustom onClick={handleUpdateTransaction} icon={<EditIcon />} isError={error}>
+    <DialogCustom onClick={handleUpdateTransaction} title="Edit Transaction" icon={<EditIcon />} isError={error}>
       <TransactionInputsGroup
         transaction={updTransaction}
         categories={categories}

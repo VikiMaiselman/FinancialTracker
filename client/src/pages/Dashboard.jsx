@@ -4,6 +4,7 @@ import CreateTransaction from "../components/CreateTransaction";
 import TransactionsContainer from "../components/TransactionsContainer";
 import BreakLine from "../components/elements/BreakLine.jsx";
 import CustomBarChart from "../components/charts/CustomBarChart";
+import CreateSubcategory from "../components/CreateSubcategory";
 
 export default function Dashboard() {
   const transactions = useSelector((state) => state.transactions);
@@ -21,6 +22,7 @@ export default function Dashboard() {
         <CustomBarChart />
       </div>
       <CreateTransaction />
+      <CreateSubcategory />
       <BreakLine />
       <TransactionsContainer categoryName={"Expenses"} txs={expenses} />
       <TransactionsContainer categoryName={"Incomes"} txs={incomes} />

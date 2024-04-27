@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import Button from "./elements/Button";
 import { checkAuthStatus, createTransaction } from "../util/server-calls.js";
-import { fireAlert, setAllMoneyState, setBalanceState, setTransactionsState } from "../util/helpers";
+import { setAllMoneyState, setTransactionsState } from "../util/helpers";
 import TransactionInputsGroup from "./TransactionInputsGroup";
 
 export default function CreateTransaction() {
@@ -54,6 +54,7 @@ export default function CreateTransaction() {
           setErrorState={setError}
         />
         <p className="flex flex-col gap-1 my-2">
+          <label className="font-bold text-stone-500 text-sm uppercase">Actions</label>
           <Button onClick={handleCreateTransaction} disabled={error || validate()}>
             Save
           </Button>

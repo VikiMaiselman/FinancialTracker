@@ -5,6 +5,7 @@ import TransactionsContainer from "../components/TransactionsContainer";
 import BreakLine from "../components/elements/BreakLine";
 import CustomPieChart from "../components/charts/CustomPieChart";
 import { filterTransactionsPerSubcategory } from "../util/helpers";
+import CreateSubcategory from "../components/CreateSubcategory";
 
 export default function CategoryTransactions({ categoryName }) {
   const transactions = useSelector((state) => state.transactions);
@@ -21,6 +22,7 @@ export default function CategoryTransactions({ categoryName }) {
         <CustomPieChart data={transactionsPerSubcategory} />
       </div>
       <CreateTransaction />
+      <CreateSubcategory />
       <BreakLine />
       <TransactionsContainer
         categoryName={categoryName}
