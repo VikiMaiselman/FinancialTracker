@@ -21,7 +21,6 @@ export default function CreateSubcategory() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
     setData((prevData) => ({ ...prevData, [name]: value }));
   };
   const handleFocus = (e) => {
@@ -58,13 +57,11 @@ export default function CreateSubcategory() {
           <AddCircleOutlineIcon /> Add Subcategory{" "}
         </>
       }
-      //   isError={error}
     >
       <Input
         name="categoryName"
         label={categoryError ? categoryError : "Category *"}
         value={data.categoryName}
-        // placeholder="Choose category ..."
         list="datalist-categories"
         options={categories}
         onChange={handleChange}
